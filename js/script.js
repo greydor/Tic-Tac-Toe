@@ -1,5 +1,7 @@
 const elCells = document.querySelectorAll(".game-board-cell");
 
+
+
 const gameBoard = (() => {
     const Cell = (rowInitial, colInitial) => {
         let state = "";
@@ -68,8 +70,15 @@ const player2 = Player("Dan");
 
 const game = (() => {
     // Init
+    const btnSelectMarker = document.querySelectorAll(".btn-marker");
     const form = document.querySelector("form");
+    const elSelectMarker = document.querySelector("#select-marker");
+    const elCurrentPlayer = document.querySelector("#current-player");
+    const elGameOutcome = document.querySelector("#game-outcome");
+    const elStartPlayer = document.querySelector("#start-player")
+
     let currentPlayer = Math.random() < 0.5 ? player1 : player2;
+    const notStartPlayer = (currentPlayer === player1) ? player2 : player1;
     player1.marker = "X";
     player2.marker = "O";
 
@@ -78,7 +87,24 @@ const game = (() => {
         player1.name = e.target["name-player1"].value;
         player2.name = e.target["name-player2"].value;
         e.preventDefault();
+        form.style.display = "none";
+        elSelectMarker.style.display = "block";
+        elStartPlayer.textContent = `The starting player is ${currentPlayer.name}`
     });
+
+    btnSelectMarker.forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+            if (e.target.id === "btn-x") {
+                currentPlayer.marker = "X"
+                notStartPlayer.marker = "O"
+            } else {
+                currentPlayer.marker = "O"
+                notStartPlayer.marker = "X"
+            }
+            elSelectMarker.style.display = "none"
+            elCurrentPlayer.style.display = "block"
+        })
+    })
 
     const changeCurrentPlayer = () => {
         if (currentPlayer === player1) {
@@ -123,15 +149,16 @@ const game = (() => {
             return winnerCheck1 || winnerCheck2;
         }
 
-
+        let winner = null;
         if (checkRowCol(player1.marker) || checkDiagonal(player1.marker)) {
-            console.log("Player 1 Wins!");
+            winner = player1;
         } else if (
             checkRowCol(player2.marker) ||
             checkDiagonal(player2.marker)
         ) {
-            console.log("Player 2 Wins!");
+            winner = player2;
         }
+        return winner;
     };
 
     let gameTurn = 0;
@@ -159,9 +186,7 @@ const game = (() => {
             gameBoard.render();
             changeCurrentPlayer();
             checkWinner();
-            if (checkGameOver()) {
-                gameBoard.reset();
-            }
+            checkGameOver();
         });
     });
 

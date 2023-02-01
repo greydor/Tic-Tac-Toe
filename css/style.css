@@ -4,6 +4,16 @@ html {
     font-family: 'Roboto', sans-serif;
 }
 
+.game-info {
+    height: 100px;
+}
+
+.game-info-select-marker,
+.game-info-current-player,
+.game-info-outcome {
+    display: none;
+}
+
 .game-board {
     --grid-border-width: 5px;
     display: grid;
