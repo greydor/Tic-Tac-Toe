@@ -1,6 +1,13 @@
+
+// Select DOM elements
 const elCells = document.querySelectorAll(".game-board-cell");
-
-
+const form = document.querySelector("form");
+const elSelectMarker = document.querySelector("#select-marker");
+const elCurrentPlayer = document.querySelector("#current-player");
+const elGameOutcome = document.querySelector("#game-outcome");
+const elStartPlayer = document.querySelector("#start-player");
+const btnReset = document.querySelector("#btn-reset");
+const btnSelectMarker = document.querySelectorAll(".btn-marker");
 
 const gameBoard = (() => {
     const Cell = (rowInitial, colInitial) => {
@@ -38,13 +45,10 @@ const gameBoard = (() => {
         });
     };
 
+    // For debugging
     const show = () => {
         const gridCopy = grid.map((row) => row.map((cell) => cell.getState()));
         return gridCopy;
-    };
-
-    const markCell = (row, col, symbol) => {
-        grid[row][col].mark(symbol);
     };
 
     const reset = () => {
@@ -56,55 +60,110 @@ const gameBoard = (() => {
         render();
     };
 
-    return { render, show, reset, markCell, grid, };
+    return { render, show, reset, grid };
 })();
 
 const Player = (string) => {
     const name = string;
-
-    return { name };
+    let marker;
+    return { name, marker };
 };
 
-const player1 = Player("John");
-const player2 = Player("Dan");
+const player1 = Player("Player 1");
+const player2 = Player("Player 2");
+
+const checkWinner = () => {
+    function checkRow(mark, grid) {
+        const winnerCheck = grid.some((row) =>
+            row.every((cell) => cell.getState() === mark)
+        );
+        return winnerCheck;
+    }
+
+    function checkRowCol(mark) {
+        // Check rows for winner, then transpose grid and check rows again.
+        const gridTranspose = _.unzip(gameBoard.grid);
+        return checkRow(mark, gameBoard.grid) || checkRow(mark, gridTranspose);
+    }
+
+    function checkDiagonal(mark) {
+        const gridDiag1 = [
+            gameBoard.grid[0][0],
+            gameBoard.grid[1][1],
+            gameBoard.grid[2][2],
+        ];
+        const gridDiag2 = [
+            gameBoard.grid[0][2],
+            gameBoard.grid[1][1],
+            gameBoard.grid[2][0],
+        ];
+        const winnerCheck1 = gridDiag1.every(
+            (cell) => cell.getState() === mark
+        );
+        const winnerCheck2 = gridDiag2.every(
+            (cell) => cell.getState() === mark
+        );
+        return winnerCheck1 || winnerCheck2;
+    }
+
+    let winner = false;
+    if (checkRowCol(player1.marker) || checkDiagonal(player1.marker)) {
+        winner = player1;
+    } else if (checkRowCol(player2.marker) || checkDiagonal(player2.marker)) {
+        winner = player2;
+    }
+    return winner;
+};
 
 const game = (() => {
     // Init
-    const btnSelectMarker = document.querySelectorAll(".btn-marker");
-    const form = document.querySelector("form");
-    const elSelectMarker = document.querySelector("#select-marker");
-    const elCurrentPlayer = document.querySelector("#current-player");
-    const elGameOutcome = document.querySelector("#game-outcome");
-    const elStartPlayer = document.querySelector("#start-player")
+    let gameTurn = 0;
+    let currentPlayer = pickStartPlayer();
+    let notStartPlayer = currentPlayer === player1 ? player2 : player1;
 
-    let currentPlayer = Math.random() < 0.5 ? player1 : player2;
-    const notStartPlayer = (currentPlayer === player1) ? player2 : player1;
-    player1.marker = "X";
-    player2.marker = "O";
+    function pickStartPlayer() {
+        return Math.random() < 0.5 ? player1 : player2;
+    }
 
-    form.addEventListener("submit", (e) => {
-        gameBoard.reset();
+    const gameState = (() => {
+        let gameActive = false;
+        const isActive = () => gameActive;
+        const set = (bool) => {
+            if (bool === true || bool === false) {
+                gameActive = bool;
+            }
+        };
+        return { isActive, set };
+    })();
+
+    function submitPlayerNames(e) {
         player1.name = e.target["name-player1"].value;
+        if (!player1.name) {
+            player1.name = "Player 1";
+        }
         player2.name = e.target["name-player2"].value;
+        if (!player2.name) {
+            player2.name = "Player 2";
+        }
         e.preventDefault();
         form.style.display = "none";
         elSelectMarker.style.display = "block";
-        elStartPlayer.textContent = `The starting player is ${currentPlayer.name}`
-    });
+        elStartPlayer.textContent = `The starting player is ${currentPlayer.name}`;
+    }
 
-    btnSelectMarker.forEach((btn) => {
-        btn.addEventListener("click", (e) => {
-            if (e.target.id === "btn-x") {
-                currentPlayer.marker = "X"
-                notStartPlayer.marker = "O"
-            } else {
-                currentPlayer.marker = "O"
-                notStartPlayer.marker = "X"
-            }
-            elSelectMarker.style.display = "none"
-            elCurrentPlayer.style.display = "block"
-        })
-    })
+    function start(e) {
+        if (e.target.id === "btn-x") {
+            currentPlayer.marker = "X";
+            notStartPlayer.marker = "O";
+        } else {
+            currentPlayer.marker = "O";
+            notStartPlayer.marker = "X";
+        }
+        elSelectMarker.style.display = "none";
+        elCurrentPlayer.style.display = "block";
+        elCurrentPlayer.textContent = `${currentPlayer.name}, it's your turn`;
+        gameState.set(true);
+    }
 
     const changeCurrentPlayer = () => {
         if (currentPlayer === player1) {
@@ -112,83 +171,79 @@ const game = (() => {
         } else {
             currentPlayer = player1;
         }
+        elCurrentPlayer.textContent = `${currentPlayer.name}, it's your turn`;
     };
 
-    const checkWinner = () => {
-        function checkRow(mark, grid) {
-            const winnerCheck = grid.some((row) =>
-                row.every((cell) => cell.getState() === mark)
-            );
-            return winnerCheck;
-        }
-
-        function checkRowCol(mark) {
-            const gridTranspose = _.unzip(gameBoard.grid);
-            return (
-                checkRow(mark, gameBoard.grid) || checkRow(mark, gridTranspose)
-            );
-        }
-
-        function checkDiagonal(mark) {
-            const gridDiag1 = [
-                gameBoard.grid[0][0],
-                gameBoard.grid[1][1],
-                gameBoard.grid[2][2],
-            ];
-            const gridDiag2 = [
-                gameBoard.grid[0][2],
-                gameBoard.grid[1][1],
-                gameBoard.grid[2][0],
-            ];
-            const winnerCheck1 = gridDiag1.every(
-                (cell) => cell.getState() === mark
-            );
-            const winnerCheck2 = gridDiag2.every(
-                (cell) => cell.getState() === mark
-            );
-            return winnerCheck1 || winnerCheck2;
-        }
-
-        let winner = null;
-        if (checkRowCol(player1.marker) || checkDiagonal(player1.marker)) {
-            winner = player1;
-        } else if (
-            checkRowCol(player2.marker) ||
-            checkDiagonal(player2.marker)
-        ) {
-            winner = player2;
-        }
-        return winner;
-    };
-
-    let gameTurn = 0;
-    
     function checkGameOver() {
-        
         if (gameTurn === 9) {
             gameTurn = 0;
             return true;
-        } 
-        
-        return false
+        }
+        return false;
     }
 
-    
-    elCells.forEach((elCell) => {
-        elCell.addEventListener("click", (e) => {
-            const row = e.target.getAttribute("data-row");
-            const col = e.target.getAttribute("data-col");
-            if (gameBoard.grid[row][col].getState() !== "") {
-                return;
-            }
-            gameBoard.grid[row][col].mark(currentPlayer.marker);
-            gameTurn += 1;
-            gameBoard.render();
-            changeCurrentPlayer();
-            checkWinner();
-            checkGameOver();
-        });
-    });
+    function reset() {
+        gameBoard.reset();
+        gameState.set(false);
+        form.style.display = "block";
+        form.reset();
+        elSelectMarker.style.display = "none";
+        elCurrentPlayer.style.display = "none";
+        elGameOutcome.style.display = "none";
+        player1.name = "Player 1";
+        player2.name = "Player 2";
+        gameTurn = 0;
+        currentPlayer = pickStartPlayer();
+        notStartPlayer = currentPlayer === player1 ? player2 : player1;
+    }
 
-    return { changeCurrentPlayer };
+    function takeTurn(e) {
+        if (gameState.isActive() === false) {
+            return;
+        }
+        const row = e.target.getAttribute("data-row");
+        const col = e.target.getAttribute("data-col");
+        if (gameBoard.grid[row][col].getState() !== "") {
+            return;
+        }
+        gameBoard.grid[row][col].mark(currentPlayer.marker);
+        gameTurn += 1;
+        gameBoard.render();
+        changeCurrentPlayer();
+        const winner = checkWinner();
+        if (winner) {
+            elCurrentPlayer.style.display = "none";
+            elGameOutcome.style.display = "block";
+            elGameOutcome.textContent = `${currentPlayer.name} is the winner!`;
+            gameState.set(false);
+        } else if (checkGameOver()) {
+            elCurrentPlayer.style.display = "none";
+            elGameOutcome.style.display = "block";
+            elGameOutcome.textContent = `Tie game!`;
+            gameState.set(false);
+        }
+    }
+
+    return { start, takeTurn, reset, submitPlayerNames };
 })();
+
+// Bind events
+btnSelectMarker.forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+        game.start(e);
+    });
+});
+
+elCells.forEach((elCell) => {
+    elCell.addEventListener("click", (e) => {
+        game.takeTurn(e);
+    });
+});
+
+btnReset.addEventListener("click", () => {
+    game.reset();
+});
+
+form.addEventListener("submit", (e) => {
+    game.submitPlayerNames(e);
+});

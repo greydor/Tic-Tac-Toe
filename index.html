@@ -14,53 +14,62 @@
     <title>Tic-Tac-Toe Game</title>
   </head>
   <body>
-    <h1>Tic-Tac-Toe</h1>
-    <div class="game-info">
-      <form action="/" method="POST">
-        <label for="name-player1">Enter name for Player 1:</label>
-        <input type="text" id="name-player1" name="name-player1" />
-        <label for="name-player2">Enter name for Player 2:</label>
-        <input type="text" id="name-player2" name="name-player2" />
-        <button type="submit" id="startBtn">Start game</button>
-      </form>
-      <div class="game-info-select-marker" id="select-marker">
-        <div id="start-player"></div>
-        <div>Choose your game marker:</div>
-        <button type="button" class="btn-marker" id="btn-x">❌</button>
-        <button type="button" class="btn-marker" id="btn-o">⭕</button>
-      </div>
-      <div class="game-info-current-player" id="current-player"></div>
-      <div class="game-info-outcome" id="game-outcome"></div>
-    </div>
-
-    <div class="game-board">
-      <div class="flex-container">
-        <div class="game-board-cell" data-row="0" data-col="0"></div>
-      </div>
-      <div class="flex-container">
-        <div class="game-board-cell" data-row="0" data-col="1"></div>
-      </div>
-      <div class="flex-container">
-        <div class="game-board-cell" data-row="0" data-col="2"></div>
-      </div>
-      <div class="flex-container">
-        <div class="game-board-cell" data-row="1" data-col="0"></div>
-      </div>
-      <div class="flex-container">
-        <div class="game-board-cell" data-row="1" data-col="1"></div>
-      </div>
-      <div class="flex-container">
-        <div class="game-board-cell" data-row="1" data-col="2"></div>
-      </div>
-      <div class="flex-container">
-        <div class="game-board-cell" data-row="2" data-col="0"></div>
-      </div>
-      <div class="flex-container">
-        <div class="game-board-cell" data-row="2" data-col="1"></div>
-      </div>
-      <div class="flex-container">
-        <div class="game-board-cell" data-row="2" data-col="2"></div>
+    <div class="flex-container">
+      <div>
+        <h1>Tic-Tac-Toe</h1>
+        <div class="game-info">
+          <form action="/" method="POST">
+            <div>
+              <label for="name-player1">Enter name for Player 1:</label>
+              <input type="text" id="name-player1" name="name-player1" />
+            </div>
+            <div>
+              <label for="name-player2">Enter name for Player 2:</label>
+              <input type="text" id="name-player2" name="name-player2" />
+            </div>
+            <button type="submit" id="startBtn">Start game</button>
+          </form>
+          <div class="game-info-select-marker" id="select-marker">
+            <div id="start-player"></div>
+            <div>Choose your game marker:</div>
+            <button type="button" class="btn-marker" id="btn-x">❌</button>
+            <button type="button" class="btn-marker" id="btn-o">⭕</button>
+          </div>
+          <div class="game-info-current-player" id="current-player"></div>
+          <div class="game-info-outcome" id="game-outcome"></div>
+          <button class="btn-reset" id="btn-reset" type="button">Reset</button>
+        </div>
+        <div class="game-board">
+          <div class="flex-container">
+            <div class="game-board-cell" data-row="0" data-col="0"></div>
+          </div>
+          <div class="flex-container">
+            <div class="game-board-cell" data-row="0" data-col="1"></div>
+          </div>
+          <div class="flex-container">
+            <div class="game-board-cell" data-row="0" data-col="2"></div>
+          </div>
+          <div class="flex-container">
+            <div class="game-board-cell" data-row="1" data-col="0"></div>
+          </div>
+          <div class="flex-container">
+            <div class="game-board-cell" data-row="1" data-col="1"></div>
+          </div>
+          <div class="flex-container">
+            <div class="game-board-cell" data-row="1" data-col="2"></div>
+          </div>
+          <div class="flex-container">
+            <div class="game-board-cell" data-row="2" data-col="0"></div>
+          </div>
+          <div class="flex-container">
+            <div class="game-board-cell" data-row="2" data-col="1"></div>
+          </div>
+          <div class="flex-container">
+            <div class="game-board-cell" data-row="2" data-col="2"></div>
+          </div>
+        </div>
       </div>
     </div>
   </body>
 </html>
+
