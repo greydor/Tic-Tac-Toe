@@ -209,7 +209,6 @@ const game = (() => {
         gameBoard.grid[row][col].mark(currentPlayer.marker);
         gameTurn += 1;
         gameBoard.render();
-        changeCurrentPlayer();
         const winner = checkWinner();
         if (winner) {
             elCurrentPlayer.style.display = "none";
@@ -222,6 +221,7 @@ const game = (() => {
             elGameOutcome.textContent = `Tie game!`;
             gameState.set(false);
         }
+        changeCurrentPlayer();
     }
 
     return { start, takeTurn, reset, submitPlayerNames };
